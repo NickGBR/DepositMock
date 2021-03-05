@@ -1,15 +1,16 @@
 package ru.interns.mock.demo.deposit.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.interns.mock.demo.deposit.dto.DepositDTO;
-import ru.interns.mock.demo.deposit.dto.OpenDepositRequestDTO;
 import ru.interns.mock.demo.deposit.enums.*;
 import ru.interns.mock.demo.deposit.repository.DepositRepository;
 import ru.interns.mock.demo.deposit.repository.dao.DepositDAO;
 
 import java.util.*;
 
+@Slf4j
 @Component
 public class DepositService {
     DepositRepository depositRepository;
@@ -64,7 +65,7 @@ public class DepositService {
         depositDAO.setPassportNumber(passportNumber);
         depositRepository.save(depositDAO);
 
-        System.out.println(getDepositNumberFromDeposit(depositDAO));
+        log.info(getDepositNumberFromDeposit(depositDAO));
         return null;
     }
 

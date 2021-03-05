@@ -31,7 +31,7 @@ public class Terrorists {
     private String middleName;
 
     @Column(name = "passport_number")
-    private String passportNumber;
+    private Long passportNumber;
 
     @Column(name = "date_of_birthday")
     private Date dateOfBirthday;
