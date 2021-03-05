@@ -9,6 +9,7 @@ import java.util.*;
 @Data
 @Builder
 public class ResponseDTO {
+    List<DepositDTO> deposits;
     DepositStatus status;
     List<DepositError> errors;
 }

@@ -9,7 +9,7 @@ import java.util.*;
 
 @Builder
 @Data
-public class OpenDepositRequestDTO {
+public class DepositRequestDTO {
     Long passportNumber;
     List<DepositError> errors;
 }
