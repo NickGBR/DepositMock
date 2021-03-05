@@ -1,12 +1,9 @@
 package ru.interns.mock.demo.mvd.dto.enums;
 
 public enum MvdErrors {
-    INCORRECT_NAME(1),
-    INCORRECT_ADDRESS(2),
-    INCORRECT_SURNAME(3),
-    INCORRECT_PASSPORT_NUMBER(4),
-    TERRORIST_ERROR(5),
-    TIME_OUT_ERROR(6);
+    PERSONAL_DATA_DOESNT_EXIST(1),
+    TERRORIST_ERROR(2),
+    TIME_OUT_ERROR(3);
 
     private int code;
 
