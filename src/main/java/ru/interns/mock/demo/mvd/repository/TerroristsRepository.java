@@ -7,4 +7,6 @@ import ru.interns.mock.demo.mvd.dao.Terrorists;
 @Repository
 public interface TerroristsRepository extends JpaRepository<Terrorists, Long> {
     Terrorists findByPassportNumber(Long passportNumber);
+
+    Terrorists getTerroristsByIdAndPassportNumber(Long id, Long passportNumber);
 }
