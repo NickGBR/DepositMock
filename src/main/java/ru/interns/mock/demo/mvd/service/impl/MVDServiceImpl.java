@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.Message;
 import org.apache.activemq.command.ActiveMQMessage;
+import org.apache.activemq.command.ActiveMQTopic;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,23 +55,20 @@ public class MVDServiceImpl implements MVDService {
                 .surname(jsonObject.getString("surname"))
                 .build();
 
-        checkError(message, requestDTO);
-    }
-
-    private void checkError(Message message, RequestDTO requestDTO) throws JsonProcessingException, JMSException {
         Terrorists potentialTerrorist = terroristsRepository.findByPassportNumber(requestDTO.getPassportNumber());
         List<MvdErrors> mvdErrors = new ArrayList<>();
         if (potentialTerrorist == null) {
-            mvdErrors.add(MvdErrors.INCORRECT_PASSPORT_NUMBER);
-            sendMessage(mvdErrors, UUID.fromString(message.getJMSCorrelationID()));
+            mvdErrors.add(MvdErrors.PERSONAL_DATA_DOESNT_EXIST);
+            sendMessage(CheckingStatus.CHECKING_FAILED, mvdErrors, UUID.fromString(message.getJMSCorrelationID()));
         } else if (potentialTerrorist.isStatus()) {
-
+            mvdErrors.add(MvdErrors.TERRORIST_ERROR);
+            sendMessage(CheckingStatus.CHECKING_FAILED, mvdErrors, UUID.fromString(message.getJMSCorrelationID()));
         }
     }
 
-    private void sendMessage(List<MvdErrors> mvdErrors, UUID uuid) throws JsonProcessingException, JMSException {
+    private void sendMessage(CheckingStatus checkingStatus, List<MvdErrors> mvdErrors, UUID uuid) throws JsonProcessingException, JMSException {
         ResultDTO resultDTO = ResultDTO.builder()
-                .checkingStatus(CheckingStatus.CHECKING_FAILED)
+                .checkingStatus(checkingStatus)
                 .mvdErrorsList(mvdErrors)
                 .build();
 
@@ -82,4 +80,5 @@ public class MVDServiceImpl implements MVDService {
         sendMessage.setJMSCorrelationID(uuid.toString());
         jmsTemplate.convertAndSend(MVDServiceImpl.RESPONSE, sendMessage);
     }
+
 }
