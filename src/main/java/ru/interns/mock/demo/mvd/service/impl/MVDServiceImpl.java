@@ -45,7 +45,9 @@ public class MVDServiceImpl implements MVDService {
     @JmsListener(destination = MVDServiceImpl.REQUEST)
     private void mqListener(Message message) throws JMSException, JSONException, JsonProcessingException {
         String json = message.getStringProperty("JSONClient");
+        String correlationID = message.getJMSCorrelationID();
         JSONObject jsonObject = new JSONObject(json);
+
         RequestDTO requestDTO = RequestDTO.builder()
                 .checkTypeCode(jsonObject.getInt("checkTypeCode"))
                 .dateOfBirthday(jsonObject.getLong("dateOfBirthday"))
@@ -56,17 +58,20 @@ public class MVDServiceImpl implements MVDService {
                 .build();
 
         Terrorists potentialTerrorist = terroristsRepository.findByPassportNumber(requestDTO.getPassportNumber());
+
         List<MvdErrors> mvdErrors = new ArrayList<>();
         if (potentialTerrorist == null) {
             mvdErrors.add(MvdErrors.PERSONAL_DATA_DOESNT_EXIST);
-            sendMessage(CheckingStatus.CHECKING_FAILED, mvdErrors, UUID.fromString(message.getJMSCorrelationID()));
+            sendMessage(CheckingStatus.CHECKING_FAILED, mvdErrors, correlationID);
         } else if (potentialTerrorist.isStatus()) {
             mvdErrors.add(MvdErrors.TERRORIST_ERROR);
-            sendMessage(CheckingStatus.CHECKING_FAILED, mvdErrors, UUID.fromString(message.getJMSCorrelationID()));
+            sendMessage(CheckingStatus.CHECKING_FAILED, mvdErrors, correlationID);
+        } else {
+            sendMessage(CheckingStatus.SUCCESS, mvdErrors, correlationID);
         }
     }
 
-    private void sendMessage(CheckingStatus checkingStatus, List<MvdErrors> mvdErrors, UUID uuid) throws JsonProcessingException, JMSException {
+    private void sendMessage(CheckingStatus checkingStatus, List<MvdErrors> mvdErrors, String uuid) throws JsonProcessingException, JMSException {
         ResultDTO resultDTO = ResultDTO.builder()
                 .checkingStatus(checkingStatus)
                 .mvdErrorsList(mvdErrors)
@@ -77,7 +82,7 @@ public class MVDServiceImpl implements MVDService {
 
         Message sendMessage = new ActiveMQMessage();
         sendMessage.setStringProperty("JSONClient", json);
-        sendMessage.setJMSCorrelationID(uuid.toString());
+        sendMessage.setJMSCorrelationID(uuid);
         jmsTemplate.convertAndSend(MVDServiceImpl.RESPONSE, sendMessage);
     }
 
