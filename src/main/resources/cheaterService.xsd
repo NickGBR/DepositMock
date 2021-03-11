@@ -1,0 +1,37 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://interns.ru/cheater-web-service"
+           targetNamespace="http://interns.ru/cheater-web-service"
+           elementFormDefault="qualified">
+
+    <xs:element name="getCheaterRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="passport" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getCheaterResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="code" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="userDTO">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="middleName" type="xs:string"/>
+            <xs:element name="sureName" type="xs:string"/>
+            <xs:element name="passport" type="xs:long"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="code">
+        <xs:restriction base="xs:long">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>
