@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class DepositDAO {
     @Id
     @Column(name = "id")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
     @Column(name = "deposit_amount")

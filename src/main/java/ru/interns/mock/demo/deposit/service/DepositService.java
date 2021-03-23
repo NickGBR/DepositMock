@@ -20,7 +20,7 @@ public class DepositService {
         this.depositRepository = depositRepository;
     }
 
-    public List<DepositDTO> getDeposits(Long passportNumber) {
+    public List<DepositDTO> getDeposits(Long passportNumber, List<DepositError> errors) {
         final List<DepositDAO> deposits = depositRepository.getDepositDaoByPassportNumber(passportNumber);
         final List<DepositDTO> depositDTOS = new ArrayList<>();
 
@@ -33,6 +33,7 @@ public class DepositService {
             }
             return depositDTOS;
         }
+        errors.add(DepositError.USER_DOESNT_HAVE_DEPOSITS);
         return new ArrayList<>();
     }
 
@@ -58,7 +59,7 @@ public class DepositService {
         depositDAO.setDepositAmount(0L);
         if (depositRepository.findTopByOrderByIdDesc() != null) {
             Integer lastUserId = depositRepository.findTopByOrderByIdDesc().getId();
-            depositDAO.setClientCode(addZeroBeforeNumber(lastUserId, 7));
+            depositDAO.setClientCode(addZeroBeforeNumber(lastUserId + 1, 7));
         } else {
             depositDAO.setClientCode(addZeroBeforeNumber(1, 7));
         }
