@@ -32,15 +32,17 @@ public class DepositController {
 
     @PostMapping("/get")
     public ResponseEntity<ResponseDTO> getDeposits(HttpServletRequest request) throws JSONException {
+        final List<DepositError> errors = new ArrayList<>();
         final ResponseDTO responseDTO = ResponseDTO.builder().build();
         final DepositRequestDTO depositRequestDTO = getDepositRequestDTO(request);
         if(depositRequestDTO.getErrors() == null){
-            final List<DepositDTO> deposits = depositService.getDeposits(depositRequestDTO.getPassportNumber());
-            if(deposits.size() == 0){
-                responseDTO.setStatus(DepositStatus.USER_DOESNT_HAVE_DEPOSITS);
+            final List<DepositDTO> deposits = depositService.getDeposits(depositRequestDTO.getPassportNumber(), errors);
+            if(errors.size() != 0){
+                responseDTO.setStatus(DepositStatus.ERROR);
+                responseDTO.setErrors(errors);
                 return ResponseEntity.ok(responseDTO);
             }
-            responseDTO.setStatus(DepositStatus.DEPOSITS_LIST);
+            responseDTO.setStatus(DepositStatus.SUCCESS);
             responseDTO.setDeposits(deposits);
             return ResponseEntity.ok(responseDTO);
         }
@@ -57,7 +59,7 @@ public class DepositController {
             final List<DepositError> errors = depositService.openDeposit(depositRequestDTO
                     .getPassportNumber());
             if (errors == null) {
-                responseDTO.setStatus(DepositStatus.OPENED_SUCCESSFULLY);
+                responseDTO.setStatus(DepositStatus.SUCCESS);
                 return ResponseEntity.ok(responseDTO);
             }
             responseDTO.setErrors(errors);
